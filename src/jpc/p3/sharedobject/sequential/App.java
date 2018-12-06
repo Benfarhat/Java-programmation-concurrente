@@ -1,6 +1,6 @@
 package jpc.p3.sharedobject.sequential;
 
-import jpc.p4.sharedobject.sequential.parallel.BankAccount;
+import jpc.p4.sharedobject.parallel.BankAccount;
 
 public class App {
 

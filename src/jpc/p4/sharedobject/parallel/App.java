@@ -1,4 +1,4 @@
-package jpc.p4.sharedobject.sequential.parallel;
+package jpc.p4.sharedobject.parallel;
 
 public class App {
 
