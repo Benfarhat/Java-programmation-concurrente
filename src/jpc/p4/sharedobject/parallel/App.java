@@ -22,7 +22,7 @@ public class App {
 			
 		}
 
-		for(int i = 0; i < 200; i++) {
+		for(int i = 0; i < 10; i++) {
 		    new Thread (new WithdrawMoney(), "TH" + i).start();
 		}
 	}
