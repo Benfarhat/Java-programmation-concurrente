@@ -19,6 +19,11 @@ public class BankAccount
     	System.out.println("===================================");
         if (amount <= balance)
         {
+        	try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
             balance -= amount;
             System.out.println ("Compte débité de " + amount + " euros");
         }

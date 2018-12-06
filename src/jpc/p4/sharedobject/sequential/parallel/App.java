@@ -3,20 +3,14 @@ package jpc.p4.sharedobject.sequential.parallel;
 public class App {
 
 	public static void main(String[] args) {
-		final BankAccount account = new BankAccount(100);
+		final BankAccount account = new BankAccount(500);
 		
 		class WithdrawMoney implements Runnable {
 			@Override
 			public void run() {
 				long threadId = Thread.currentThread().getId();
 				
-				account.withdraw(1);
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				account.withdraw(1);
+				account.withdraw(100);
 	            System.out.println ("Thread #" 
 	            		+ threadId
 	            		+ " - "
