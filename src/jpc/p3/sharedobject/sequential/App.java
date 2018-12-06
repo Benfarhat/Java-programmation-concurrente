@@ -1,5 +1,7 @@
 package jpc.p3.sharedobject.sequential;
 
+import jpc.p4.sharedobject.sequential.parallel.BankAccount;
+
 public class App {
 
 	public static void main(String[] args) {
@@ -11,7 +13,5 @@ public class App {
 	    account.withdraw (250);
 	    System.out.println ("\tIl reste " + account.getBalance() + " euros sur le compte");
 		
-
 	}
-
 }
