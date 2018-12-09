@@ -19,11 +19,18 @@ class Countdown implements Runnable
 	public void run()
     {
     	int randomNum;
+    	long startTime = System.nanoTime();
     	while(!canceled) {
+            try
+            {
+                Thread.sleep (10);
+            }
+            catch (InterruptedException exception){}
     		display(2);
     	}
-
-		System.out.println("\n\tStopped after canceled!");
+    	long endTime   = System.nanoTime();
+		System.out.println("\n\tCanceled after: " + (( endTime - startTime) / 1000000) + " millis." );
+		System.out.println("\n\tSupposed to be canceled after 5000 millis!");
         
     }
 	
@@ -76,6 +83,7 @@ class Countdown implements Runnable
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+	    	if(canceled) break;
 	    }
     }
 }
