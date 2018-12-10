@@ -43,8 +43,8 @@ class SharedIntBuffer
  
     public synchronized int read()
     {
-        // Si le buffer n'est pas vide, retourne l'élément suivant et le supprime du buffer
-        // Sinon, bloque jusqu'à ce qu'un élément soit ajouté
+        // Tant qu'il y a des éléments dzans le buffer on retourne le suivant qu'on supprime par la même occasion
+        // Si le buffer est vide, bloquer le process jusqu'a ajout d'un élement
         while (inBuffer == 0)
         {
             try
@@ -65,8 +65,7 @@ class SharedIntBuffer
  
     public synchronized void put (int i)
     {
-        // Si le buffer n'est pas plein, ajoute l'élément i dans le buffer
-        // Sinon, bloque jusqu'à ce que de la place soit libérée
+        // On bloque le buffer tant qu'il n'y a pas de place
     	 while (inBuffer == size)
     	    {
     	        try
