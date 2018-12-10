@@ -10,9 +10,7 @@ class SleepingTask implements Runnable
         {
             synchronized (this)
             {	
-            	this.notify();
-                System.out.println ("2A. State after unattended notify(): " + Thread.currentThread().getState());
-                System.out.println ("Go for sleeping");
+            	System.out.println ("Go for sleeping");
                 this.wait();
                 System.out.println ("2. State after calling wait(): " + Thread.currentThread().getState());
             }
