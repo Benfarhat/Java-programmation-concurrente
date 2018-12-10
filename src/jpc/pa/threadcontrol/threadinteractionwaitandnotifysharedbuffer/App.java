@@ -1,58 +1,109 @@
 package jpc.pa.threadcontrol.threadinteractionwaitandnotifysharedbuffer;
 
+import java.util.Arrays;
 
-class SleepingTask implements Runnable
-{
-    public void run()
-    {
-        System.out.println ("1. State in run method: " + Thread.currentThread().getState());
-        try
-        {
-            synchronized (this)
-            {	
-            	System.out.println ("Go for sleeping");
-                this.wait();
-                System.out.println ("2. State after calling wait(): " + Thread.currentThread().getState());
-            }
- 
-            System.out.println ("Normal End");
-        }
-        catch (InterruptedException exception)
-        {
-            System.out.println ("Interrupted End");
+class Consumer implements Runnable{
+    private final SharedIntBuffer buffer;
+
+    public Consumer(SharedIntBuffer sb){
+        buffer = sb;
+    }
+
+    public void run() {
+    	System.out.println("\tConsumer: " + Thread.currentThread().getName() +" running:");
+        while(!buffer.isEmpty()) {
+            int i = buffer.read();
+            System.out.println("\t\tConsumer " + Thread.currentThread().getName() +" reads "+i); // this print may not be in the order
         }
     }
 }
-public class App {
-	public static void main(String[] args) {
-	    SleepingTask task = new SleepingTask();
-	    Thread thread = new Thread (task);
-	    System.out.println ("3. State before start(): " + thread.getState());
-	    thread.start();
-	    System.out.println ("4. State after start(): " + thread.getState());
-	 
-	    try
-	    {
-	        Thread.sleep (5000);
-		    System.out.println ("5. State after sleep(): " + thread.getState());
-	    }
-	    catch (InterruptedException exception){}
-	 
-	    synchronized (task)
-	    {
 
-		    System.out.println ("6. State before notify(): " + thread.getState());
-	        task.notify();
-		    System.out.println ("7. State after notify(): " + thread.getState());
-	    }
-	    System.out.println ("Main thread ended (no more action...)");
-	    System.out.println ("8. Is thread alive? : " + thread.isAlive());
-	    System.out.println ("9. Is thread interrupted? : " + thread.isInterrupted());
-	    thread.interrupt();
-	    System.out.println ("Main thread interrupted (calling interrupt())");
-	    System.out.println ("10. Is thread alive? : " + thread.isAlive());
-	    System.out.println ("11. Is thread interrupted? : " + thread.isInterrupted());
-	    System.out.println ("12. State after interrupt(): " + thread.getState());
+
+class Producer implements Runnable{
+    private final SharedIntBuffer buffer;
+
+    Producer(SharedIntBuffer sb) {
+        this.buffer = sb;
+    }
+
+    public void run(){
+    	System.out.println("\tProducer: " + Thread.currentThread().getName() +" running:");
+    	while(!buffer.isFull()) {
+            int n = (int) (Math.random()*100);
+            buffer.put(n);
+            System.out.println("\t\tProducer " + Thread.currentThread().getName() +" puts "+n);
+        }
+    }
+}
+
+class SharedIntBuffer
+{
+    private final int[] buffer = new int[20];
+    private int first, last, size = 20, inBuffer;
+ 
+    public synchronized int read()
+    {
+        // Si le buffer n'est pas vide, retourne l'élément suivant et le supprime du buffer
+        // Sinon, bloque jusqu'à ce qu'un élément soit ajouté
+        while (inBuffer == 0)
+        {
+            try
+            {
+                wait();
+            }
+            catch (InterruptedException exception){}
+        }
+     
+        first = (first + 1) % size;
+        inBuffer--;
+        displayContent();
+        notifyAll();
+        return buffer[first];
+    }
+    
+
+ 
+    public synchronized void put (int i)
+    {
+        // Si le buffer n'est pas plein, ajoute l'élément i dans le buffer
+        // Sinon, bloque jusqu'à ce que de la place soit libérée
+    	 while (inBuffer == size)
+    	    {
+    	        try
+    	        {
+    	            wait();
+    	        }
+    	        catch (InterruptedException exception){}
+    	    }
+    	 
+    	    last = (last + 1) % size;
+    	    inBuffer++;
+    	    buffer[last] = i;
+    	    notifyAll();
+    }
+
+
+    public synchronized boolean isEmpty(){
+            return (inBuffer == 0);
+    }  
+    
+    public synchronized boolean isFull(){
+        return (inBuffer == size);
+    }    
+    
+    public synchronized void displayContent() {
+    	System.out.println(Thread.currentThread().getName() + " Buffer content : " + Arrays.toString(buffer));
+    }
+}
+public class App {
+	private volatile static SharedIntBuffer sib = new SharedIntBuffer();
+	public static void main(String[] args) {
+		for(int i=0; i < 10; i++) {
+			System.out.println("\t" + i + ":");
+			new Thread(new Producer(sib)).start();
+			new Thread(new Consumer(sib)).start();
+			
+		}
 		
 	}
 }
